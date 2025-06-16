@@ -7,14 +7,14 @@ document.getElementById("qa-form").addEventListener("submit", function (e) {
 
     console.log("Sending data:", { name, address, email });
 
-
     fetch("https://script.google.com/macros/s/AKfycbxAvjvL_CrBERhIe-25h9JlpmuAvsmviXueRRNaS0Of8xn-VGmsFEOeQ3GDFXejtgen/exec", {
-        
-      method: "POST",
-      body: JSON.stringify({ name, address, email  }),
-      headers: {
-        "Content-Type": "application/json"
-      }
+        method: "POST",
+        mode: "cors",
+        credentials: "omit",
+        body: JSON.stringify({ name, address, email }),
+        headers: {
+            "Content-Type": "application/json"
+        }
     })
     .then(response => response.json())
     .then(data => {
