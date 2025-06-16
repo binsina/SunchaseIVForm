@@ -7,7 +7,7 @@ document.getElementById("qa-form").addEventListener("submit", function (e) {
 
     console.log("Sending data:", { name, address, email });
 
-    fetch("https://script.google.com/macros/s/AKfycbxAvjvL_CrBERhIe-25h9JlpmuAvsmviXueRRNaS0Of8xn-VGmsFEOeQ3GDFXejtgen/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbzfo_OPEbQ3_rxy0vVWx_lNhkYhL9sEx4dP-l6fexf2rmWeOA7hzAwtZ2oAi8gwcVU/exec", {
         method: "POST",
         mode: "cors",
         credentials: "omit",
