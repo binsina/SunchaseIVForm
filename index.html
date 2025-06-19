@@ -5,22 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Q&A Form</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
+  <div class="logo-container">
+    <img src="Images/sunchase.png" alt="Sunchase Logo" class="logo">
+  </div>
+  
+
   <div class="container">
+    <h1>Guest Questionnaire Form</h1>
     <form 
       id="submitForm"
       method="POST" 
       action="https://script.google.com/macros/s/AKfycbzXwZJJ-YRip9SphLmMLzbzT-nbCIqi9y4N1vP4ID6ItAxEpXfpUvCvx1hbpT3hXoUy/exec"
     >
-      <input name="Email" type="email" placeholder="Email" required>
-      <input name="Name" type="text" placeholder="Name" required>
-      <button type="submit">Send</button>
+    <div class="form-group">
+      <label for="NameOfReservation">Primary Contact Telephone Number (reachable 24/7 ):</label>
+      <input id="NameOfReservation" name="NameOfReservation" type="text" placeholder="Name of the person Who did the Reservation" required>
+    </div>
+    <div class="form-group">
+      <label for="contactNumber">Primary Contact Telephone Number (reachable 24/7 ):</label>
+      <input id="contactNumber" name="ContactNumber" type="tel" placeholder="Contact Number" required>
+    </div>
+   
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input id="email" name="Email" type="email" placeholder="Email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="rentalAgent">Rental Agent name:</label>
+        <input id="rentalAgent" name="RentalAgent" type="text" placeholder="Rental Agent" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="arrivalDate">Arrival Date:</label>
+        <input id="arrivalDate" name="ArrivalDate" type="date" placeholder="Arrival Date" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="departureDate">Departure Date:</label>
+        <input id="departureDate" name="DepartureDate" type="date" placeholder="Departure Date" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="bedroomOption">Bedroom Option:</label>
+        <select id="bedroomOption" name="BedroomOption" required>
+          <option value="">Select Bedroom Option</option>
+          <option value="1">1 bedroom/4 person occupancy</option>
+          <option value="2">2 bedroom/6 person occupancy</option>
+          <option value="3">3 bedroom/8 person occupancy</option>
+        </select>
+      </div>
+      
+      <div id="guestInputs" class="guest-inputs"></div>
+      
+      <button type="submit">Submit</button>
     </form>
-    <h1>Questionnaire Form</h1>
+   
   </div>
 
   <script>
+    // Function to generate guest inputs based on bedroom option
+    function generateGuestInputs(numGuests) {
+      const guestInputsDiv = document.getElementById('guestInputs');
+      guestInputsDiv.innerHTML = '';
+      
+      for (let i = 1; i <= numGuests; i++) {
+        const guestGroup = document.createElement('div');
+        guestGroup.className = 'guest-group';
+        guestGroup.style.opacity = '0';
+        guestGroup.style.transition = 'opacity 0.5s ease-in-out';
+        
+        guestGroup.innerHTML = `
+          <div class="guest-input-group">
+            <label for="GuestName${i}">Full Name Guest ${i}:</label>
+            <input id="GuestName${i}" name="GuestName${i}" type="text" placeholder="Full Name Guest ${i}" required>
+          </div>
+          <div class="guest-input-group">
+            <label for="GuestAge${i}">Age of Guest ${i}:</label>
+            <input id="GuestAge${i}" name="Guest${i}Age" type="number" placeholder="Age of Guest ${i}" min="0" max="120" required>
+          </div>
+        `;
+        
+        guestInputsDiv.appendChild(guestGroup);
+        
+        // Fade in effect
+        setTimeout(() => {
+          guestGroup.style.opacity = '1';
+        }, i * 100);
+      }
+    }
+    
+    // Event listener for bedroom option change
+    document.getElementById('bedroomOption').addEventListener('change', function() {
+      const selectedValue = this.value;
+      const guestInputsDiv = document.getElementById('guestInputs');
+      
+      // Clear existing inputs with fade out
+      const existingGroups = guestInputsDiv.querySelectorAll('.guest-group');
+      existingGroups.forEach((group, index) => {
+        setTimeout(() => {
+          group.style.opacity = '0';
+        }, index * 50);
+      });
+      
+      // Generate new inputs after fade out
+      setTimeout(() => {
+        if (selectedValue === '1') {
+          generateGuestInputs(4);
+        } else if (selectedValue === '2') {
+          generateGuestInputs(6);
+        } else if (selectedValue === '3') {
+          generateGuestInputs(8);
+        } else {
+          guestInputsDiv.innerHTML = '';
+        }
+      }, existingGroups.length * 50 + 200);
+    });
+
     document.getElementById('submitForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -33,15 +137,35 @@
       .then(response => response.json())
       .then(data => {
         if (data.result === 'success') {
-          alert('Form submitted successfully!');
+          Swal.fire({
+            title: 'Success!',
+            text: 'Form submitted successfully!',
+            icon: 'success',
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = 'https://sunchaseiv.org/index.php';
+            }
+          });
           this.reset(); // Clear the form
+          document.getElementById('guestInputs').innerHTML = ''; // Clear guest inputs
         } else {
-          alert('There was an error submitting the form. Please try again.');
+          Swal.fire({
+            title: 'Error!',
+            text: 'There was an error submitting the form. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('There was an error submitting the form. Please try again.');
+        Swal.fire({
+          title: 'Error!',
+          text: 'There was an error submitting the form. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
       });
     });
   </script>

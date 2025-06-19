@@ -1,30 +1,81 @@
 body {
     font-family: Arial, sans-serif;
-    background: #f4f4f4;
+    background: url('Images/palmtree.jpg') no-repeat center center fixed;
+    background-size: cover;
     margin: 0;
     padding: 20px;
+    min-height: 100vh;
   }
   
   .container {
     background: white;
     padding: 20px;
     max-width: 600px;
-    margin: auto;
+    margin: 10px auto 0 auto;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  h1 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
   }
   
   label {
     display: block;
     margin-top: 15px;
     font-weight: bold;
+    color: #333;
   }
   
-  input, textarea {
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+  
+  input, textarea, select {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
     box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  select {
+    background-color: white;
+    cursor: pointer;
+  }
+  
+  .guest-inputs {
+    margin-top: 15px;
+  }
+  
+  .guest-group {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: flex-start;
+  }
+  
+  .guest-input-group {
+    flex: 1;
+  }
+  
+  .guest-input-group label {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  
+  .guest-input-group input {
+    margin-top: 0;
   }
   
   button {
@@ -34,6 +85,8 @@ body {
     color: white;
     border: none;
     cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
   }
   
   button:hover {
@@ -49,5 +102,18 @@ body {
   
   .hidden {
     display: none;
+  }
+  
+  .logo-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+  }
+  
+  .logo {
+    width: 508px;
+    height: 71px;
+
   }
   
