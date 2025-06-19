@@ -21,12 +21,12 @@
       action="https://script.google.com/macros/s/AKfycbwd118N01O63xp8oYpEW5wr3zdrKzebWcpCA9jq-IDmj-ZGUZlMXHBzC9QD62eyL7yq/exec"
     >
     <div class="form-group">
-      <label for="NameOfReservation">Primary Contact Telephone Number (reachable 24/7 ):</label>
-      <input id="NameOfReservation" name="NameOfReservation" type="text" placeholder="Name of the person Who did the Reservation" required>
+      <label for="NameOfReservation">Name of the person Who did the Reservation:</label>
+      <input id="NameOfReservation" name="NameOfReservation" type="text" placeholder="Full Name" required>
     </div>
     <div class="form-group">
       <label for="contactNumber">Primary Contact Telephone Number (reachable 24/7 ):</label>
-      <input id="contactNumber" name="ContactNumber" type="tel" placeholder="Contact Number" required>
+      <input id="contactNumber" name="ContactNumber" type="text" placeholder="Contact Number" required>
     </div>
    
       <div class="form-group">
@@ -35,7 +35,7 @@
       </div>
       
       <div class="form-group">
-        <label for="rentalAgent">Rental Agent name:</label>
+        <label for="rentalAgent">Rental Agent Name:</label>
         <input id="rentalAgent" name="RentalAgent" type="text" placeholder="Rental Agent" required>
       </div>
       
@@ -50,20 +50,28 @@
       </div>
       
       <div class="form-group">
-        <label for="bedroomOption">Bedroom Option:</label>
-        <select id="bedroomOption" name="BedroomOption" required>
+        <label for="NumberOfBedrooms">Bedroom Option:</label>
+        <select id="NumberOfBedrooms" name="NumberOfBedrooms" required>
           <option value="">Select Bedroom Option</option>
-          <option value="1">1 bedroom/4 person occupancy</option>
-          <option value="2">2 bedroom/6 person occupancy</option>
-          <option value="3">3 bedroom/8 person occupancy</option>
+          <option value="1 Bedroom">1 bedroom/4 person occupancy</option>
+          <option value="2 Bedrooms">2 bedroom/6 person occupancy</option>
+          <option value="3 Bedrooms">3 bedroom/8 person occupancy</option>
         </select>
       </div>
       
       <div id="guestInputs" class="guest-inputs"></div>
       
-      <button type="submit">Submit</button>
+      <button type="submit">Submit Form</button>
     </form>
    
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Submitting form...</p>
+    </div>
   </div>
 
   <script>
@@ -81,11 +89,11 @@
         guestGroup.innerHTML = `
           <div class="guest-input-group">
             <label for="GuestName${i}">Full Name Guest ${i}:</label>
-            <input id="GuestName${i}" name="GuestName${i}" type="text" placeholder="Full Name Guest ${i}" required>
+            <input id="GuestName${i}" name="GuestName${i}" type="text" placeholder="Full Name of Guest ${i}" ${i === 1 ? 'required' : ''}>
           </div>
           <div class="guest-input-group">
             <label for="GuestAge${i}">Age of Guest ${i}:</label>
-            <input id="GuestAge${i}" name="Guest${i}Age" type="number" placeholder="Age of Guest ${i}" min="0" max="120" required>
+            <input id="GuestAge${i}" name="GuestAge${i}" type="number" placeholder="Age of Guest ${i}" min="0" max="120" ${i === 1 ? 'required' : ''}>
           </div>
         `;
         
@@ -99,7 +107,7 @@
     }
     
     // Event listener for bedroom option change
-    document.getElementById('bedroomOption').addEventListener('change', function() {
+    document.getElementById('NumberOfBedrooms').addEventListener('change', function() {
       const selectedValue = this.value;
       const guestInputsDiv = document.getElementById('guestInputs');
       
@@ -113,11 +121,11 @@
       
       // Generate new inputs after fade out
       setTimeout(() => {
-        if (selectedValue === '1') {
+        if (selectedValue === '1 Bedroom') {
           generateGuestInputs(4);
-        } else if (selectedValue === '2') {
+        } else if (selectedValue === '2 Bedrooms') {
           generateGuestInputs(6);
-        } else if (selectedValue === '3') {
+        } else if (selectedValue === '3 Bedrooms') {
           generateGuestInputs(8);
         } else {
           guestInputsDiv.innerHTML = '';
@@ -128,28 +136,52 @@
     document.getElementById('submitForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
+      // Disable submit button to prevent double-clicking
+      const submitButton = this.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = 'Submitting...';
+      
+      // Show loading overlay
+      document.getElementById('loadingOverlay').style.display = 'flex';
+      
       const formData = new FormData(this);
+      
+      // Add submission time
+      const currentTime = new Date().toLocaleTimeString();
+      formData.append('Time', currentTime);
+      
+      // Convert all form data to strings
+      const stringData = new FormData();
+      for (let [key, value] of formData.entries()) {
+        stringData.append(key, value.toString());
+      }
       
       fetch(this.action, {
         method: 'POST',
-        body: formData
+        body: stringData
       })
       .then(response => response.json())
       .then(data => {
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').style.display = 'none';
+        
         if (data.result === 'success') {
           Swal.fire({
             title: 'Success!',
             text: 'Form submitted successfully!',
             icon: 'success',
-            confirmButtonText: 'OK'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = 'https://sunchaseiv.org/index.php';
-            }
+            timer: 2000,
+            showConfirmButton: false
+          }).then(() => {
+            window.location.href = 'https://sunchaseiv.org/index.php';
           });
           this.reset(); // Clear the form
           document.getElementById('guestInputs').innerHTML = ''; // Clear guest inputs
         } else {
+          // Re-enable submit button on error
+          submitButton.disabled = false;
+          submitButton.textContent = 'Submit Form';
+          
           Swal.fire({
             title: 'Error!',
             text: 'There was an error submitting the form. Please try again.',
@@ -159,6 +191,13 @@
         }
       })
       .catch(error => {
+        // Hide loading overlay
+        document.getElementById('loadingOverlay').style.display = 'none';
+        
+        // Re-enable submit button on error
+        submitButton.disabled = false;
+        submitButton.textContent = 'Submit Form';
+        
         console.error('Error:', error);
         Swal.fire({
           title: 'Error!',
